@@ -170,6 +170,7 @@ form[action$="destroy"] button {
   display: flex;
   height: 100%;
   width: 100%;
+  text-align: left;
 }
 
 #sidebar {

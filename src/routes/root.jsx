@@ -1,8 +1,15 @@
-import { Link, Outlet, useLoaderData } from "react-router-dom";
-import { getContacts } from "../contacts";
-export  async function loader(){
-    const contacts=await getContacts();
+import { Link, Outlet, useLoaderData,redirect, NavLink } from "react-router-dom";
+import { getContacts,createContact } from "../contacts";
+import { Form } from "react-router-dom";
+export  async function loader({params}){
+    const contacts=await getContacts(params.conatactId);
     return {contacts}
+}
+export async function action() {
+    const contact=await createContact();
+    console.log(contact,10)
+    return redirect(`/contacts/${contact.id}/edit`);
+    //return {contact};
 }
 export default function Root(){
     const {contacts} =useLoaderData();
@@ -16,24 +23,28 @@ export default function Root(){
                     <div className="search-spinner" aria-hidden hidden={true}></div>
                     <div className="sr-only" aria-live="polite"></div>
                 </form>
-                <form action="#" method="post">
-                    <button type="submit">New</button>
-                </form>
+                <Form method="post">
+            <button type="submit">New</button>
+          </Form>
             </div>
             <nav>
                 {contacts.length?(
                     <ul>
                         {contacts.map((contact)=>{
-                            <li key={contact.id}>
-                                <Link to={`contacts/${contact.id}`}>
-                                 {contact.first || contact.last?(
-                                    <> {contact.first} {contact.last}
+                            //console.log(contact,33)
+                           return <li key={contact.id}>
+                                <NavLink to={`contacts/${contact.id}`} className={
+                                    ({isActive,isPending})=>isActive?"active":isPending?"pending":""
+                                }>
+                                 {(contact.first || contact.last)?(
+                                    <> 
+                                    {contact.first} {contact.last}
                                     </>
                                  ):(
                                     <i>No Name</i>
                                  )} { " "}
                                  {contact.favorite && <span>★</span>}
-                                </Link>
+                                </NavLink>
                             </li>
                         })}
                     </ul>
@@ -46,5 +57,6 @@ export default function Root(){
             <Outlet/>
         </div>
         </>
+        
     )
 }
